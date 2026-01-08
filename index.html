@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>月詠アオイ｜会員登録</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      background: #0e0f1a;
+      color: #ffffff;
+      padding: 24px;
+    }
+    h1 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+    p {
+      font-size: 14px;
+      opacity: 0.85;
+    }
+    label {
+      display: block;
+      margin-top: 16px;
+      font-size: 14px;
+    }
+    select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 6px;
+      border: none;
+      font-size: 14px;
+    }
+    button {
+      background: #6f7cff;
+      color: #fff;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🌙 月詠アオイ 会員登録</h1>
+<p>LINE内で簡単に登録できます。</p>
+
+<form id="registerForm">
+  <label>
+    年代（任意）
+    <select id="age">
+      <option value="">選択しない</option>
+      <option value="20代">20代</option>
+      <option value="30代">30代</option>
+      <option value="40代">40代</option>
+      <option value="50代以上">50代以上</option>
+    </select>
+  </label>
+
+  <label>
+    今、気になっていること
+    <select id="interest">
+      <option value="恋愛">恋愛</option>
+      <option value="仕事">仕事</option>
+      <option value="人間関係">人間関係</option>
+      <option value="なんとなく">なんとなく</option>
+    </select>
+  </label>
+
+  <button type="submit">登録する</button>
+</form>
+
+<script>
+  async function main() {
+    await liff.init({ liffId: "あなたのLIFF_ID" });
+
+    if (!liff.isLoggedIn()) {
+      liff.login();
+      return;
+    }
+
+    const profile = await liff.getProfile();
+    window.userId = profile.userId;
+    window.displayName = profile.displayName;
+  }
+
+  document.getElementById("registerForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const data = {
+      userId: window.userId,
+      name: window.displayName,
+      age: document.getElementById("age").value,
+      interest: document.getElementById("interest").value
+    };
+
+    // ここは後で make.com のWebhook URLに差し替え
+    fetch("https://HOOK_URLをここに", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    alert("登録ありがとうございます 🌙");
+    liff.closeWindow();
+  });
+
+  main();
+</script>
+
+</body>
+</html>
