@@ -80,8 +80,10 @@
     }
 
     const profile = await liff.getProfile();
-    window.userId = profile.userId;
-    window.displayName = profile.displayName;
+    const nickname = document.getElementById("nickname").value;
+    const email = document.getElementById("email").value;
+
+    sendToWebhook(profile, nickname, email);
   }
 
   document.getElementById("registerForm").addEventListener("submit", function(e) {
@@ -95,15 +97,50 @@
     };
 
     // ここは後で make.com のWebhook URLに差し替え
-    fetch("https://HOOK_URLをここに", {
+    fetch("https://hook.make.com/xxxxxxxx", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        lineUserId: profile.userId,
+        displayName: profile.displayName,
+        email: email,
+        nickname: nickname,
+        source: "liff-register"
+      })
     });
+
 
     alert("登録ありがとうございます 🌙");
     liff.closeWindow();
   });
+
+    function sendToWebhook(profile, nickname, email) {
+    fetch("https://hook.make.com/XXXXXXXXXX", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        lineUserId: profile.userId,
+        displayName: profile.displayName,
+        email: email,
+        nickname: nickname,
+        source: "liff-register"
+      })
+    })
+    .then(() => {
+      alert("登録が完了しました！");
+      liff.closeWindow();
+    })
+    .catch(err => {
+      alert("登録に失敗しました");
+      console.error(err);
+    });
+  }
+</script>
+
 
   main();
 </script>
