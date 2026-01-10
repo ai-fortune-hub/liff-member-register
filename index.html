@@ -5,6 +5,7 @@
   <title>月詠アオイ｜会員登録</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
@@ -12,26 +13,14 @@
       color: #ffffff;
       padding: 24px;
     }
-    h1 {
-      font-size: 20px;
-      margin-bottom: 8px;
-    }
-    p {
-      font-size: 14px;
-      opacity: 0.85;
-    }
-    label {
-      display: block;
-      margin-top: 16px;
-      font-size: 14px;
-    }
+    h1 { font-size: 20px; }
+    label { display: block; margin-top: 16px; }
     select, button {
       width: 100%;
       padding: 10px;
       margin-top: 6px;
       border-radius: 6px;
       border: none;
-      font-size: 14px;
     }
     button {
       background: #6f7cff;
@@ -40,14 +29,15 @@
     }
   </style>
 </head>
+
 <body>
 
 <h1>🌙 月詠アオイ 会員登録</h1>
-<p>LINE内で簡単に登録できます。</p>
+<p>LINE内で簡単に登録できます</p>
 
 <form id="registerForm">
   <label>
-    年代（任意）
+    年代
     <select id="age">
       <option value="">選択しない</option>
       <option value="20代">20代</option>
@@ -58,7 +48,7 @@
   </label>
 
   <label>
-    今、気になっていること
+    今気になっていること
     <select id="interest">
       <option value="恋愛">恋愛</option>
       <option value="仕事">仕事</option>
@@ -71,78 +61,43 @@
 </form>
 
 <script>
-  async function main() {
-    await liff.init({ liffId: "2008848785-WASIQY8b" });
+async function initLIFF() {
+  await liff.init({ liffId: "2008848785-WASIQY8b" });
 
-    if (!liff.isLoggedIn()) {
-      liff.login();
-      return;
-    }
-
-    const profile = await liff.getProfile();
-    const nickname = document.getElementById("nickname").value;
-    const email = document.getElementById("email").value;
-
-    sendToWebhook(profile, nickname, email);
+  if (!liff.isLoggedIn()) {
+    liff.login();
   }
+}
 
-  document.getElementById("registerForm").addEventListener("submit", function(e) {
-    e.preventDefault();
+initLIFF();
 
-    const data = {
-      userId: window.userId,
-      name: window.displayName,
-      age: document.getElementById("age").value,
-      interest: document.getElementById("interest").value
-    };
+document.getElementById("registerForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    // ここは後で make.com のWebhook URLに差し替え
-/*
-    fetch("https://hook.eu1.make.com/uvstd1gj6q9w4xj6ef7nepfdtimrap8v", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        lineUserId: profile.userId,
-        displayName: profile.displayName,
-        email: email,
-        nickname: nickname,
-        source: "liff-register"
-      })
-    });
+  const profile = await liff.getProfile();
 
+  const payload = {
+    lineUserId: profile.userId,
+    displayName: profile.displayName,
+    age: document.getElementById("age").value,
+    interest: document.getElementById("interest").value,
+    source: "liff-register"
+  };
 
-    alert("登録ありがとうございます 🌙");
+  fetch("https://hook.eu1.make.com/uvstd1gj6q9w4xj6ef7nepfdtimrap8v", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(() => {
+    alert("登録が完了しました 🌙");
     liff.closeWindow();
+  })
+  .catch(err => {
+    alert("送信に失敗しました");
+    console.error(err);
   });
-*/
-    function sendToWebhook(profile, nickname, email) {
-    fetch("https://hook.eu1.make.com/uvstd1gj6q9w4xj6ef7nepfdtimrap8v", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        lineUserId: profile.userId,
-        displayName: profile.displayName,
-        email: email,
-        nickname: nickname,
-        source: "liff-register"
-      })
-    })
-    .then(() => {
-      alert("登録が完了しました！");
-      liff.closeWindow();
-    })
-    .catch(err => {
-      alert("登録に失敗しました");
-      console.error(err);
-    });
-  }
-
-
-//  main();
+});
 </script>
 
 </body>
